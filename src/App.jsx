@@ -33,9 +33,12 @@ function PageLoader() {
 
 export default function App() {
   const location = useLocation();
+  const isChat = location.pathname === '/chat';
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between overflow-hidden">
+    <div className={`relative min-h-screen flex flex-col justify-between overflow-hidden ${
+      isChat ? 'h-screen' : ''
+    }`}>
       {/* Scroll indicator at the very top */}
       <ScrollProgress />
 
@@ -46,7 +49,7 @@ export default function App() {
       <Navbar />
 
       {/* Route Switch with wait transitions */}
-      <main className="flex-1">
+      <main className={`flex-1 ${isChat ? 'overflow-hidden h-full' : ''}`}>
         <Suspense fallback={<PageLoader />}>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>

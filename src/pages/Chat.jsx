@@ -115,7 +115,7 @@ export default function Chat() {
 
   return (
     <PageTransition>
-      <div className="flex h-[calc(100vh-80px)] mt-20 overflow-hidden relative w-full bg-[#0D0F1A]">
+      <div data-lenis-prevent className="flex h-screen pt-20 overflow-hidden relative w-full bg-[#0D0F1A]">
         {/* SIDEBAR (Desktop) */}
         <aside className="hidden md:flex flex-col w-80 bg-[#13152A] border-r border-white/5 p-6 justify-between overflow-y-auto">
           <div className="flex flex-col gap-6">
