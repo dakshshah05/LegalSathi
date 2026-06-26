@@ -101,6 +101,26 @@ def fallback_retrieval(query: str):
     response += "*(Note: Add a GEMINI_API_KEY in the backend .env to enable conversational AI-synthesized responses)*"
     return response
 
+def call_pollinations_ai(system_prompt: str, user_query: str) -> str:
+    url = "https://text.pollinations.ai/"
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_query}
+        ],
+        "model": "openai"  # Maps to GPT-4o-mini on Pollinations (high quality, fast, and free)
+    }
+    try:
+        import requests
+        response = requests.post(url, headers=headers, json=payload, timeout=25)
+        if response.status_code == 200:
+            return response.text.strip()
+        else:
+            return f"Error from AI endpoint (Status {response.status_code}): {response.text}"
+    except Exception as e:
+        return f"Failed to connect to free AI endpoint: {str(e)}"
+
 # Pydantic models for type safety
 class ChatRequest(BaseModel):
     query: str
@@ -113,12 +133,39 @@ async def chat_endpoint(request: ChatRequest):
         raise HTTPException(status_code=400, detail="Query cannot be empty")
     
     try:
+        answer = None
+        
+        # 1. Try Gemini RAG first (if configured and has quota)
         if rag_chain:
-            # Execute LangChain Gemini retrieval
-            result = rag_chain.invoke({"input": query_text})
-            answer = result.get("answer")
-        else:
-            # Fallback search matching
+            try:
+                result = rag_chain.invoke({"input": query_text})
+                answer = result.get("answer")
+            except Exception as e:
+                print(f"Gemini call failed (falling back to Pollinations AI): {e}")
+        
+        # 2. If Gemini failed or is not configured, run RAG with free Pollinations AI
+        if not answer:
+            context_str = ""
+            if retriever:
+                try:
+                    docs = retriever.invoke(query_text)
+                    context_str = "\n\n".join([doc.page_content for doc in docs])
+                except Exception as e:
+                    print(f"RAG retrieval warning: {e}")
+            
+            system_prompt = (
+                "You are LegalSaathi, a supportive, confidential, and expert legal advisor for women in India.\n"
+                "Answer the user's question clearly, comforting, and professionally. "
+                "If the retrieved legal context below contains relevant information (such as section numbers, laws, or helplines), prioritize using it and refer to it directly. "
+                "If the retrieved context does not contain the answer or is not relevant to the query (for example, regarding tenancy/rent disputes, consumer rights, labor laws, contract law, or other civil/criminal matters), use your extensive knowledge of Indian law and judicial procedures to provide a detailed, accurate, comforting, and helpful guide. "
+                "Always state relevant sections, acts, and actionable steps under Indian law.\n\n"
+                f"Retrieved Legal Context:\n{context_str if context_str else 'No direct matching document chunks found.'}"
+            )
+            
+            answer = call_pollinations_ai(system_prompt, query_text)
+            
+        # 3. Tertiary fallback: pure text snippet retrieval
+        if not answer:
             answer = fallback_retrieval(query_text)
             
         return {"response": answer}
