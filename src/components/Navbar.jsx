@@ -85,11 +85,11 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 h-20 z-50 transition-transform duration-400 ease-out glass-panel bg-[#0D0F1A]/80 border-b border-white/5 backdrop-blur-xl flex items-center ${
-          isVisible ? 'translate-y-0' : '-translate-y-full'
+        className={`fixed top-4 left-1/2 -translate-x-1/2 w-[92%] max-w-5xl h-16 z-50 transition-all duration-400 ease-out glass-panel bg-[#0D0F1A]/85 border border-white/10 backdrop-blur-xl flex items-center rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.6)] ${
+          isVisible ? 'translate-y-0 opacity-100' : '-translate-y-28 opacity-0 scale-90'
         }`}
       >
-        <div className="max-w-7xl mx-auto w-full px-6 flex items-center justify-between">
+        <div className="w-full px-8 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group cursor-pointer z-50">
             <motion.div
