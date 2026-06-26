@@ -5,7 +5,7 @@ LegalSaathi is a dark, premium, and trustworthy web application designed to empo
 ## Architecture & Tech Stack
 
 - **Frontend (React 18 + Vite)**: Styling via Tailwind CSS, page transitions with Framer Motion, parallax/horizontal scrolls/timelines via GSAP + ScrollTrigger, and scrolling smoothing via Lenis.
-- **Backend (Python + FastAPI + LangChain RAG)**: Document loader and chunking via LangChain, retrieval indexing via `TFIDFRetriever` (scikit-learn), and conversational synthesis via `ChatGoogleGenerativeAI` (gemini-1.5-flash). Falls back to exact keyword match logic if no API keys are present.
+- **Backend (Python + FastAPI + LangChain RAG)**: Document loader and chunking via LangChain, retrieval indexing via `TFIDFRetriever` (scikit-learn), and conversational synthesis via `ChatGoogleGenerativeAI` (gemini-3.5-flash). Falls back to exact keyword match logic if no API keys are present.
 
 ---
 

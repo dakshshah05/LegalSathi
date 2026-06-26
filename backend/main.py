@@ -61,7 +61,7 @@ rag_chain = None
 if gemini_key and retriever:
     try:
         # Define LLM
-        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.3, google_api_key=gemini_key)
+        llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0.3, google_api_key=gemini_key)
         
         # Define Prompt Template
         system_prompt = (
