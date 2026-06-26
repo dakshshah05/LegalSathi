@@ -61,8 +61,8 @@ export default function App() {
         </Suspense>
       </main>
 
-      {/* Global site footer */}
-      <Footer />
+      {/* Global site footer, hidden on chat page to prevent double scrollbars */}
+      {location.pathname !== '/chat' && <Footer />}
     </div>
   );
 }
