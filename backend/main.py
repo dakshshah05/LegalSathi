@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.retrievers import TFIDFRetriever
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
@@ -54,14 +54,14 @@ else:
     retriever = None
     print("Warning: No document chunks loaded. RAG retrieval will be disabled.")
 
-# Configure LLM and RAG chain if OpenAI API key is present
-openai_key = os.getenv("OPENAI_API_KEY", "").strip() or None
+# Configure LLM and RAG chain if Gemini API key is present
+gemini_key = os.getenv("GEMINI_API_KEY", "").strip() or os.getenv("GOOGLE_API_KEY", "").strip() or None
 rag_chain = None
 
-if openai_key and retriever:
+if gemini_key and retriever:
     try:
         # Define LLM
-        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3, api_key=openai_key)
+        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.3, google_api_key=gemini_key)
         
         # Define Prompt Template
         system_prompt = (
@@ -80,9 +80,9 @@ if openai_key and retriever:
         question_answer_chain = create_stuff_documents_chain(llm, prompt)
         # Create retrieval chain
         rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-        print("Success: RAG pipeline configured with OpenAI ChatOpenAI.")
+        print("Success: RAG pipeline configured with ChatGoogleGenerativeAI.")
     except Exception as e:
-        print(f"Error configuring OpenAI chain: {e}")
+        print(f"Error configuring Gemini chain: {e}")
 
 # Fallback retrieval matching function (runs offline/without API keys)
 def fallback_retrieval(query: str):
@@ -97,7 +97,7 @@ def fallback_retrieval(query: str):
     response = "Based on our verified Indian legal documents, here is the relevant legal guidance:\n\n"
     for doc in docs[:2]:
         response += f"⚖️ {doc.page_content.strip()}\n\n"
-    response += "*(Note: Add an OPENAI_API_KEY in the backend .env to enable conversational AI-synthesized responses)*"
+    response += "*(Note: Add a GEMINI_API_KEY in the backend .env to enable conversational AI-synthesized responses)*"
     return response
 
 # Pydantic models for type safety
@@ -113,7 +113,7 @@ async def chat_endpoint(request: ChatRequest):
     
     try:
         if rag_chain:
-            # Execute LangChain OpenAI retrieval
+            # Execute LangChain Gemini retrieval
             result = rag_chain.invoke({"input": query_text})
             answer = result.get("answer")
         else:
@@ -128,7 +128,7 @@ async def chat_endpoint(request: ChatRequest):
 async def health_endpoint():
     return {
         "status": "healthy",
-        "openai_enabled": openai_key is not None,
+        "gemini_enabled": gemini_key is not None,
         "loaded_documents_count": len(documents),
         "total_chunks": len(chunks)
     }

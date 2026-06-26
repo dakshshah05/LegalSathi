@@ -5,7 +5,7 @@ LegalSaathi is a dark, premium, and trustworthy web application designed to empo
 ## Architecture & Tech Stack
 
 - **Frontend (React 18 + Vite)**: Styling via Tailwind CSS, page transitions with Framer Motion, parallax/horizontal scrolls/timelines via GSAP + ScrollTrigger, and scrolling smoothing via Lenis.
-- **Backend (Python + FastAPI + LangChain RAG)**: Document loader and chunking via LangChain, retrieval indexing via `TFIDFRetriever` (scikit-learn), and conversational synthesis via `ChatOpenAI` (gpt-4o-mini). Falls back to exact keyword match logic if no API keys are present.
+- **Backend (Python + FastAPI + LangChain RAG)**: Document loader and chunking via LangChain, retrieval indexing via `TFIDFRetriever` (scikit-learn), and conversational synthesis via `ChatGoogleGenerativeAI` (gemini-1.5-flash). Falls back to exact keyword match logic if no API keys are present.
 
 ---
 
@@ -59,7 +59,7 @@ LegalSaathi/
    ```
 5. Create a `.env` file inside `backend/` and configure:
    ```env
-   OPENAI_API_KEY=your_openai_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
    PORT=8000
    ```
    *(Note: If no API key is provided, the chatbot will fallback to context-matching retrieval without AI summaries, running completely offline and free)*
@@ -106,7 +106,7 @@ To make the chatbot query work in production, you must deploy the `backend/` dir
      - **Build Command**: `pip install -r requirements.txt`
      - **Start Command**: `python -m uvicorn main:app --host 0.0.0.0 --port $PORT`
   4. Under **Environment Variables**, add:
-     - `OPENAI_API_KEY` = `[your real key]`
+     - `GEMINI_API_KEY` = `[your real key]`
      - `PORT` = `8000`
   5. Copy your deployed Render URL (e.g., `https://legalsaathi-backend.onrender.com`).
 
