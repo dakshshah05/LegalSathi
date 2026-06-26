@@ -126,9 +126,20 @@ async def chat_endpoint(request: ChatRequest):
 
 @app.get("/health")
 async def health_endpoint():
+    available_models = []
+    if gemini_key:
+        try:
+            from google import genai
+            client = genai.Client(api_key=gemini_key)
+            # Retrieve model names using the new google-genai SDK
+            available_models = [m.name for m in client.models.list()]
+        except Exception as e:
+            available_models = [f"Error listing models: {str(e)}"]
+
     return {
         "status": "healthy",
         "gemini_enabled": gemini_key is not None,
+        "available_models": available_models,
         "loaded_documents_count": len(documents),
         "total_chunks": len(chunks)
     }
