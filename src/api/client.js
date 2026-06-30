@@ -8,7 +8,7 @@ const client = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 60000 // 60 seconds timeout
+  timeout: 140000 // 60 seconds timeout
 });
 
 // Intercept responses to handle offline errors cleanly
